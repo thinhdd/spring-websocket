@@ -15,114 +15,52 @@
  */
 package org.springframework.samples.portfolio.service;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.SimpMessageType;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.samples.portfolio.Portfolio;
-import org.springframework.samples.portfolio.PortfolioPosition;
-import org.springframework.samples.portfolio.service.Trade.TradeAction;
+import org.springframework.samples.portfolio.dto.MessageDTO;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MimeTypeUtils;
-import sun.net.www.MessageHeader;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 
 @Service
 public class TradeServiceImpl implements TradeService {
 
-	@Autowired
-	IUserService userService;
+    @Autowired
+    IUserService userService;
+    private final SimpMessageSendingOperations messagingTemplate;
 
-	private static final Log logger = LogFactory.getLog(TradeServiceImpl.class);
+    @Autowired
+    public TradeServiceImpl(SimpMessageSendingOperations messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
-	private final SimpMessageSendingOperations messagingTemplate;
+    /**
+     * In real application a trade is probably executed in an external system, i.e. asynchronously.
+     */
+    public void executeTrade(Trade trade) {
 
-	private final PortfolioService portfolioService;
-
-	private final List<TradeResult> tradeResults = new CopyOnWriteArrayList<TradeResult>();
-
-
-	@Autowired
-	public TradeServiceImpl(SimpMessageSendingOperations messagingTemplate, PortfolioService portfolioService) {
-		this.messagingTemplate = messagingTemplate;
-		this.portfolioService = portfolioService;
-	}
-
-	/**
-	 * In real application a trade is probably executed in an external system, i.e. asynchronously.
-	 */
-	public void executeTrade(Trade trade) {
-
-		Portfolio portfolio = this.portfolioService.findPortfolio(trade.getUsername());
-		String ticker = trade.getTicker();
-		int sharesToTrade = trade.getShares();
-
-		PortfolioPosition newPosition = (trade.getAction() == TradeAction.Buy) ?
-				portfolio.buy(ticker, sharesToTrade) : portfolio.sell(ticker, sharesToTrade);
-
-		if (newPosition == null) {
-			String payload = "Rejected trade " + trade;
-			this.messagingTemplate.convertAndSendToUser(trade.getUsername(), "/queue/errors", payload);
-			return;
-		}
-
-		this.tradeResults.add(new TradeResult(trade.getUsername(), newPosition));
-	}
-
-//	@Scheduled(fixedDelay=1500)
-//	public void sendTradeNotifications() {
-//
-//		Map<String, Object> map = new HashMap<String, Object>();
-//		map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
-//
-//		for (TradeResult result : this.tradeResults) {
-//			if (System.currentTimeMillis() >= (result.timestamp + 1500)) {
-//				logger.debug("Sending position update: " + result.position);
-//				this.messagingTemplate.convertAndSendToUser(result.user, "/queue/position-updates", result.position, map);
-//				this.tradeResults.remove(result);
-//			}
-//		}
-//	}
-
-	@Scheduled(fixedDelay=1500)
-	public void checkSendOnlyUser() {
-		for(String sessionId: userService.findSessionUser("thinhdd"))
-		{
-			this.messagingTemplate.convertAndSendToUser(sessionId,"/queue/position-updates","tesssssts",createHeaders(sessionId));
-		}
-	}
-
-	private MessageHeaders createHeaders(String sessionId) {
-		SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
-		headerAccessor.setSessionId(sessionId);
-		headerAccessor.setLeaveMutable(true);
-		return headerAccessor.getMessageHeaders();
-	}
+    }
 
 
-	private static class TradeResult {
+    @Scheduled(fixedDelay = 1500)
+    public void checkSendOnlyUser() {
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setMessage("Giấy xác nhận chuyển tiền");
+        messageDTO.setTitle("Xác nhận chuyển tiền");
 
-		private final String user;
-		private final PortfolioPosition position;
-		private final long timestamp;
+        for (String sessionId : userService.findSessionUser("thinhdd")) {
+            this.messagingTemplate.convertAndSendToUser(sessionId, "/queue/position-updates", messageDTO, createHeaders(sessionId));
+        }
+    }
 
-		public TradeResult(String user, PortfolioPosition position) {
-			this.user = user;
-			this.position = position;
-			this.timestamp = System.currentTimeMillis();
-		}
-	}
+    private MessageHeaders createHeaders(String sessionId) {
+        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
+        headerAccessor.setSessionId(sessionId);
+        headerAccessor.setLeaveMutable(true);
+        return headerAccessor.getMessageHeaders();
+    }
 
 }

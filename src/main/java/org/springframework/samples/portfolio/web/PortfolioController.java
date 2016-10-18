@@ -15,50 +15,31 @@
  */
 package org.springframework.samples.portfolio.web;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.samples.portfolio.Portfolio;
-import org.springframework.samples.portfolio.PortfolioPosition;
-import org.springframework.samples.portfolio.service.PortfolioService;
-import org.springframework.samples.portfolio.service.Trade;
-import org.springframework.samples.portfolio.service.TradeService;
 import org.springframework.stereotype.Controller;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Controller
 public class PortfolioController {
 
-	private static final Log logger = LogFactory.getLog(PortfolioController.class);
+    private static final Log logger = LogFactory.getLog(PortfolioController.class);
 
-	private final PortfolioService portfolioService;
+    @SubscribeMapping("/positions")
+    public List<Object> getPositions() throws Exception {
+        return new ArrayList<Object>();
+    }
 
-	private final TradeService tradeService;
-
-
-	@Autowired
-	public PortfolioController(PortfolioService portfolioService, TradeService tradeService) {
-		this.portfolioService = portfolioService;
-		this.tradeService = tradeService;
-	}
-
-	@SubscribeMapping("/positions")
-	public List<PortfolioPosition> getPositions() throws Exception {
-		return new ArrayList<PortfolioPosition>();
-	}
-
-	@MessageExceptionHandler
-	@SendToUser("/queue/errors")
-	public String handleException(Throwable exception) {
-		return exception.getMessage();
-	}
+    @MessageExceptionHandler
+    @SendToUser("/queue/errors")
+    public String handleException(Throwable exception) {
+        return exception.getMessage();
+    }
 
 }

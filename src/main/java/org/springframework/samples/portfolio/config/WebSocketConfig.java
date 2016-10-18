@@ -12,7 +12,6 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 @Configuration
-@EnableScheduling
 @ComponentScan("org.springframework.samples")
 @EnableWebSocketMessageBroker
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
@@ -36,15 +35,8 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
         registration.setInterceptors(clientConnectInterceptorHandler());
     }
 
-    @Override
-    public void configureClientOutboundChannel(final ChannelRegistration registration) {
-        registration.taskExecutor().corePoolSize(2);
-    }
-
     @Bean
     ClientConnectInterceptorHandler clientConnectInterceptorHandler(){
         return new ClientConnectInterceptorHandler();
     };
-
-
 }

@@ -19,6 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +49,15 @@ public class UserController {
             result.add(user.toString());
         }
         return result;
+    }
+
+    @SubscribeMapping("/hello")
+    @SendToUser("/topic/helloAll")
+    public String helloAll(Message<Object> message) {
+        StompHeaderAccessor sha = StompHeaderAccessor.wrap(message);
+        String userName = sha.getLogin();
+
+        return userName + ":" + message.getPayload();
     }
 
 }

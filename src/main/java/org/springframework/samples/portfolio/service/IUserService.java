@@ -9,6 +9,7 @@ public interface IUserService {
 
     List<String> findSessionUser(String userName );
 
-    void addSessionUser(String user,String sessionId);
+    void validateUser(String user, String sessionId) throws IllegalArgumentException;
 
+    void removeUserSession(String userName, String sessionId);
 }
