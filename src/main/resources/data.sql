@@ -1,0 +1,1 @@
+INSERT INTO user(id, user_name, password) VALUES ('7c2bcaac-a4d6-11e6-80f5-76304dec7eb7', 'thinh', '123456')

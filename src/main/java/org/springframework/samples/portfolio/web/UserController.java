@@ -26,15 +26,18 @@ import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.samples.portfolio.dto.UserDTO;
+import org.springframework.samples.portfolio.repository.UserRepository;
+import org.springframework.samples.portfolio.service.IUserService;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@ResponseBody
 public class UserController {
 
     private SimpUserRegistry userRegistry;
-
+    @Autowired
+    IUserService userService;
 
     @Autowired
     public UserController(SimpUserRegistry userRegistry) {
@@ -60,4 +63,8 @@ public class UserController {
         return userName + ":" + message.getPayload();
     }
 
+    @PostMapping
+    public UserDTO login(@RequestBody UserDTO userDTO) throws Exception {
+        return userService.login(userDTO);
+    }
 }

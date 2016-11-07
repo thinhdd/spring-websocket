@@ -37,16 +37,9 @@ public class TradeServiceImpl implements TradeService {
         this.messagingTemplate = messagingTemplate;
     }
 
-    /**
-     * In real application a trade is probably executed in an external system, i.e. asynchronously.
-     */
-    public void executeTrade(Trade trade) {
-
-    }
-
 
     @Scheduled(fixedDelay = 1500)
-    public void checkSendOnlyUser() {
+    public void sendSpecificUser() {
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setMessage("Giấy xác nhận chuyển tiền");
         messageDTO.setTitle("Xác nhận chuyển tiền");
@@ -54,6 +47,14 @@ public class TradeServiceImpl implements TradeService {
         for (String sessionId : userService.findSessionUser("thinhdd")) {
             this.messagingTemplate.convertAndSendToUser(sessionId, "/queue/position-updates", messageDTO, createHeaders(sessionId));
         }
+    }
+
+    @Scheduled(fixedDelay = 1500)
+    public void sendAllUser() {
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setMessage("Giấy xác nhận chuyển tiền");
+        messageDTO.setTitle("Xác nhận chuyển tiền");
+        this.messagingTemplate.convertAndSend("/queue/for-me", messageDTO);
     }
 
     private MessageHeaders createHeaders(String sessionId) {

@@ -28,21 +28,21 @@ public class ClientConnectInterceptorHandler extends ChannelInterceptorAdapter {
             return;
         }
 
-        String userName = sha.getLogin();
+        String token = sha.getLogin();
         String passcode = sha.getPasscode();
         String sessionId = sha.getSessionId();
         switch (sha.getCommand()) {
 
             case CONNECT:
                 logger.info("STOMP Connect [sessionId: " + sessionId + "]");
-                userService.validateUser(userName, sessionId);
+                userService.validateUser(token, sessionId);
                 break;
             case CONNECTED:
                 logger.info("STOMP Connected [sessionId: " + sessionId + "]");
                 break;
             case DISCONNECT:
                 logger.info("STOMP Disconnect [sessionId: " + sessionId + "]");
-                userService.removeUserSession(userName, sessionId);
+                userService.removeUserSession(token, sessionId);
                 break;
             default:
                 break;

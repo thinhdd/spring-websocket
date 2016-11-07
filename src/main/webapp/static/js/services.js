@@ -56,33 +56,32 @@ angular.module('springPortfolio.services', [])
         };
         return wrappedSocket;
     }])
-    .factory('TradeService', ['StompClient', '$q', function (StompClient, $q) {
+    .factory('loginService', function ($http) {
 
         return {
-            connect: function (username, password, url) {
-                StompClient.init(url);
-                return StompClient.connect(username, password).then(function (frame) {
-                    return frame.headers['user-name'];
-                });
-            },
-            disconnect: function () {
-                StompClient.disconnect();
-            },
-            loadPositions: function () {
-                return StompClient.subscribeSingle("/app/positions");
-            },
-            fetchQuoteStream: function () {
-                return StompClient.subscribe("/topic/price.stock.*");
-            },
-            fetchPositionUpdateStream: function () {
-                return StompClient.subscribe("/user/queue/position-updates");
-            },
-            fetchErrorStream: function () {
-                return StompClient.subscribe("/user/queue/errors");
-            },
-            sendTradeOrder: function (tradeOrder) {
-                return StompClient.send("/app/trade", {}, JSON.stringify(tradeOrder));
-            }
+            login : login
         };
 
-    }]);
+        function login(userDTO){
+            return $http.post(userDTO);
+        }
+
+    })
+    //.factory('loginService', ['StompClient', '$q', function (StompClient, $q) {
+    //
+    //    return {
+    //        connect: function (username, password, url) {
+    //            StompClient.init(url);
+    //            return StompClient.connect(username, password).then(function (frame) {
+    //                return frame.headers['user-name'];
+    //            });
+    //        },
+    //        disconnect: function () {
+    //            StompClient.disconnect();
+    //        },
+    //        fetchPositionUpdateStream: function () {
+    //            return StompClient.subscribe("/user/queue/for-me");
+    //        }
+    //    };
+    //
+    //}]);
