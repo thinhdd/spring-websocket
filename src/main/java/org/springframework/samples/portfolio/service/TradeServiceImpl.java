@@ -38,16 +38,16 @@ public class TradeServiceImpl implements TradeService {
     }
 
 
-    @Scheduled(fixedDelay = 1500)
-    public void sendSpecificUser() {
-        MessageDTO messageDTO = new MessageDTO();
-        messageDTO.setMessage("Giấy xác nhận chuyển tiền");
-        messageDTO.setTitle("Xác nhận chuyển tiền");
-
-        for (String sessionId : userService.findSessionUser("thinhdd")) {
-            this.messagingTemplate.convertAndSendToUser(sessionId, "/queue/position-updates", messageDTO, createHeaders(sessionId));
-        }
-    }
+//    @Scheduled(fixedDelay = 1500)
+//    public void sendSpecificUser() {
+//        MessageDTO messageDTO = new MessageDTO();
+//        messageDTO.setMessage("Giấy xác nhận chuyển tiền");
+//        messageDTO.setTitle("Xác nhận chuyển tiền");
+//
+//        for (String sessionId : userService.findSessionUser("thinhdd")) {
+//            this.messagingTemplate.convertAndSendToUser(sessionId, "/queue/position-updates", messageDTO, createHeaders(sessionId));
+//        }
+//    }
 
     @Scheduled(fixedDelay = 1500)
     public void sendAllUser() {

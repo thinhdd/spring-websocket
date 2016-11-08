@@ -9,7 +9,7 @@ import java.util.Date;
  * Created by thinhdd on 10/18/2016.
  */
 @Entity
-@Table(name = "user")
+@Table(name = "token")
 public class Token {
 
     @Id
