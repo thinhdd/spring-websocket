@@ -43,7 +43,10 @@ public class UserController {
     public UserController(SimpUserRegistry userRegistry) {
         this.userRegistry = userRegistry;
     }
-
+    @RequestMapping(value="/",method = RequestMethod.GET)
+    public String homepage(){
+        return "index";
+    }
 
     @RequestMapping(path = "/users", method = RequestMethod.GET)
     public List<String> listUsers() {
@@ -64,6 +67,7 @@ public class UserController {
     }
 
     @PostMapping
+    @RequestMapping(value="/login",method = RequestMethod.POST)
     public UserDTO login(@RequestBody UserDTO userDTO) throws Exception {
         return userService.login(userDTO);
     }
